@@ -1,0 +1,63 @@
+@startuml fluxo de atividade
+start
+:Recebimento do Titulo de Cobrança;
+:Inserção do Titulo no "Sistema de Cobrança";
+
+fork
+    :Emissão/envio da Primeira Carta de Cobrança;
+fork again
+    :Passa contato do devedor p/ atendentes;
+    :Tentativa de contato com o devedor;
+end fork
+
+fork
+    if (Retorno da Primeira Carta?) then (sim)
+        :Inicio da Negociação via carta;
+        if (Sucesso na negociação via carta?) then (sim)
+            :É feito o Pagamento e a transferência dos valores p/ empresa contratante;
+            stop
+        else (não)
+        endif
+    else (não)
+        :Emissão/envio da Segunda Carta de Cobrança;
+    endif
+fork again
+    if (Sucesso de contato?) then (sim)
+        if (Devedor quer resolver pendências?) then (sim)
+            :Inicio da Negociação via call;
+            if (Sucesso na negociação via call?) then (sim)
+                :É feito o Pagamento e a transferência dos valores p/ empresa contratante;
+                stop
+            else (não)
+            endif
+        else (não)
+        endif
+    else (não)
+    endif
+end fork
+
+:Acionamento do cobrador externo;
+if (Cobrador localizou o devedor?) then (sim)
+    if (Devedor tem interesse em negociar?) then (sim)
+        :Inicio da Negociação via cobrador externo;
+        if (Sucesso na negociação?) then (sim)
+            :É feito o Pagamento e a transferência dos valores p/ empresa contratante;
+            stop
+        else (não)
+            :Protesto do Título;
+        endif
+    else (não)
+        :Protesto do Título;
+    endif
+else (não)
+    :Protesto do Título;
+endif
+
+if (Título pago após protesto?) then (sim)
+    :Transferência dos valores p/ empresa contratante;
+else (não)
+    :Devolução do Título;
+endif
+
+stop
+@enduml
