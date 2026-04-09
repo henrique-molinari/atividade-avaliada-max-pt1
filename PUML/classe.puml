@@ -1,0 +1,102 @@
+@startuml classe
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+
+' Classes principais
+
+class EmpresaContratante {
+    +Nome
+    +Identificação
+}
+
+class Devedor {
+    +Nome
+    +Documento
+}
+
+class Titulo {
+    +Identificador
+    +valor
+    +dataVencimento
+    +status
+    --
+    +iniciarCobranca()
+    +inicicarNegociacao()
+    +protestar()
+    +encerrar()
+}
+
+class Cobranca {
+    +dataInicio
+    +status
+    --
+    +executar()
+    +encerrar()
+}
+
+class Negociacao {
+    +data
+    +condicoes
+    --
+    +registrarAcordo()
+    +cancelar()
+}
+
+class Pagamento {
+    +data
+    +valor
+    --
+    +confirmar()
+}
+
+class Protesto {
+    +dataProtesto
+}
+
+class TransferenciaFinanceira {
+    +data 
+    +valor 
+    --
+    +transferir()
+}
+
+' Formas de Cobrança
+
+abstract class FormaCobranca {
+    +descricao
+    --
+    +realizarCobranca()
+}
+
+class CartaCobranca {
+    +dataEnvio
+}
+
+class ContatoTelefonico {
+    +dataContato
+}
+
+class CobradorExterno {
+    +dataAcionamento
+}
+
+' Relacionamentos
+
+EmpresaContratante "1" -- "*" Titulo
+Devedor "1" -- "*" Titulo
+
+Titulo "1" -- "*" Cobranca
+Cobranca "1" -- "1" FormaCobranca
+
+FormaCobranca <|-- CartaCobranca 
+FormaCobranca <|-- ContatoTelefonico
+FormaCobranca <|-- CobradorExterno
+
+Titulo "1" -- "0..1" Negociacao
+Negociacao "1" -- "*" Pagamento
+Titulo "1" -- "0..1" Protesto
+
+Pagamento "1" -- "1" TransferenciaFinanceira
+TransferenciaFinanceira "*" -- "1" EmpresaContratante
+
+@enduml
