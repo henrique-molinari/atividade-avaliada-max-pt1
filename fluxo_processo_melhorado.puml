@@ -1,0 +1,82 @@
+@startuml fluxo de atividade melhorado
+start
+:Recebimento do Titulo de Cobrança;
+:Inserção do Titulo no "Sistema de Cobrança";
+
+fork
+    :Emissão/envio da Primeira Carta de Cobrança;
+fork again
+    :Disparo automático de notificação\npor SMS, E-mail e WhatsApp;
+fork again
+    :Passa contato do devedor p/ atendentes;
+    :Tentativa de contato com o devedor\n(máx. 3 tentativas registradas no sistema);
+end fork
+
+fork
+    if (Retorno da Primeira Carta?) then (sim)
+        :Devedor acessa Portal de Autosserviço;
+        :Simulação e escolha de parcelamento;
+        if (Devedor efetuou pagamento no portal?) then (sim)
+            :Sistema confirma pagamento e\ntransferência automática p/ empresa contratante;
+            stop
+        else (não)
+        endif
+    else (não)
+        :Emissão/envio da Segunda Carta de Cobrança;
+    endif
+fork again
+    if (Devedor respondeu notificação digital?) then (sim)
+        :Devedor acessa Portal de Autosserviço;
+        :Simulação e escolha de parcelamento;
+        if (Devedor efetuou pagamento no portal?) then (sim)
+            :Sistema confirma pagamento e\ntransferência automática p/ empresa contratante;
+            stop
+        else (não)
+        endif
+    else (não)
+    endif
+fork again
+    if (Sucesso de contato via call?) then (sim)
+        if (Devedor quer resolver pendências?) then (sim)
+            :Atendente envia link do\nPortal de Autosserviço ao devedor;
+            if (Devedor efetuou pagamento no portal?) then (sim)
+                :Sistema confirma pagamento e\ntransferência automática p/ empresa contratante;
+                stop
+            else (não)
+            endif
+        else (não)
+        endif
+    else (não)
+    endif
+end fork
+
+:Sistema calcula Score de Propensão a Pagamento;
+if (Score favorável ao acionamento externo?) then (sim)
+    :Acionamento do cobrador externo;
+    if (Cobrador localizou o devedor?) then (sim)
+        if (Devedor tem interesse em negociar?) then (sim)
+            :Cobrador envia link do\nPortal de Autosserviço ao devedor;
+            if (Devedor efetuou pagamento no portal?) then (sim)
+                :Sistema confirma pagamento e\ntransferência automática p/ empresa contratante;
+                stop
+            else (não)
+                :Protesto do Título;
+            endif
+        else (não)
+            :Protesto do Título;
+        endif
+    else (não)
+        :Protesto do Título;
+    endif
+else (não)
+    :Protesto do Título;
+endif
+
+if (Título pago após protesto?) then (sim)
+    :Sistema confirma pagamento e\ntransferência automática p/ empresa contratante;
+else (não)
+    :Devolução do Título;
+endif
+
+stop
+@enduml
